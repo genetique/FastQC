@@ -58,6 +58,7 @@ my $unzip;
 my $format;
 my $contaminant;
 my $adapter;
+my $limits;
 my $threads;
 my $quiet;
 my $nogroup;
@@ -82,6 +83,7 @@ my $result = GetOptions('version' => \$version,
 						'nofilter' => \$nofilter,
 						'contaminants=s' => \$contaminant,
 						'adapters=s' => \$adapter,
+						'limits=s' => \$limits,
 						'dir=s' => \$temp_directory,
 						'java=s' => \$java_bin,
 						 );
@@ -119,6 +121,13 @@ if ($adapter)  {
 		die "Adapters file '$adapter' did not exist, or could not be read\n";
 	}
 	push @java_args ,"-Dfastqc.adapter_file=$adapter";
+}
+
+if ($limits)  {
+	unless (-e $limits and -r $limits) {
+		die "Limits file '$limits' did not exist, or could not be read\n";
+	}
+	push @java_args ,"-Dfastqc.limits_file=$limits";
 }
 
 if ($temp_directory) {
@@ -335,6 +344,13 @@ DESCRIPTION
                     the library. The file must contain sets of named adapters
                     in the form name[tab]sequence.  Lines prefixed with a hash
                     will be ignored.
+                    
+    -l              Specifies a non-default file which contains a set of criteria
+    --limits        which will be used to determine the warn/error limits for the
+                    various modules.  This file can also be used to selectively 
+                    remove some modules from the output all together.  The format
+                    needs to mirror the default limits.txt file found in the
+                    Configuration folder.
                     
    -k --kmers       Specifies the length of Kmer to look for in the Kmer content
                     module. Specified Kmer length must be between 2 and 10. Default

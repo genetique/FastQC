@@ -57,8 +57,8 @@ gc_sequence	error	30
 
 # The per sequence quality module tests the phred score which is
 # most frequently observed
-quality_sequence	warn	20
-quality_sequence	error	27
+quality_sequence	warn	27
+quality_sequence	error	20
 
 # The per tile module tests the maximum phred score loss between 
 # and individual tile and the average for that base across all tiles

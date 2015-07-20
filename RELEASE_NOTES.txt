@@ -1,3 +1,27 @@
+RELEASE NOTES FOR FastQC v0.11.2
+--------------------------------
+
+This is a minor bug-fix release which addresses some issues 
+reported with the v0.11.1 release.
+
+1) Added a proper implementation of a --limits command line
+option to allow users to specify a custom limits file for an 
+individual run.  This also fixed a bug seen if the user used the
+--adapter option.
+
+2) Fixed an error in the naming of the folder inside the zip file
+such that it couldn't be extracted into the same folder as the
+main HTML file.
+
+3) Fixed an overly large data structure which was causing some
+runs to terminate due to a lack of memory.
+
+4) Fixed a poor implementation in the Kmer module which was 
+causing unusually high memory usage.
+
+5) Fixed incorrect defaults for the warn/fail values in the per
+sequence quality module.
+
 RELEASE NOTES FOR FastQC V0.11.1
 --------------------------------
 
