@@ -11,18 +11,17 @@ if (-e "$RealBin/uk/ac/bbsrc/babraham/FastQC/FastQCApplication.java") {
 	die "This is the source distribution of FastQC.  You need to get the compiled version if you want to run the program\n";
 }
 
-
-if ($ENV{CLASSPATH}) {
-#	$ENV{CLASSPATH} .= ":$RealBin:$RealBin/sam-1.32.jar:$RealBin/jbzip2-0.9.jar:$RealBin/goby_1.9.7.2-api.jar:$RealBin/fastutil-6.3.jar:protobuf-java-2.4.1.jar:$RealBin/commons-io-2.0.1.jar:$RealBin/commons-logging-1.1.1.jar";
-	$ENV{CLASSPATH} .= ":$RealBin:$RealBin/sam-1.32.jar:$RealBin/jbzip2-0.9.jar";
-}
-else {
-#	$ENV{CLASSPATH} = "$RealBin:$RealBin/sam-1.32.jar:$RealBin/jbzip2-0.9.jar:$RealBin/goby_1.9.7.2-api.jar:$RealBin/fastutil-6.3.jar:protobuf-java-2.4.1.jar:$RealBin/commons-io-2.0.1.jar:$RealBin/commons-logging-1.1.1.jar";
-	$ENV{CLASSPATH} = "$RealBin:$RealBin/sam-1.32.jar:$RealBin/jbzip2-0.9.jar";
-}
+my $delimiter = ':';
 
 if ($^O =~ /Win/) {
-	$ENV{CLASSPATH} =~ s/\.(jar|zip):/\.jar;/g;
+	$delimiter = ';';
+}
+
+if ($ENV{CLASSPATH}) {
+	$ENV{CLASSPATH} .= "$delimiter$RealBin$delimiter$RealBin/sam-1.32.jar$delimiter$RealBin/jbzip2-0.9.jar";
+}
+else {
+	$ENV{CLASSPATH} = "$RealBin$delimiter$RealBin/sam-1.32.jar$delimiter$RealBin/jbzip2-0.9.jar";
 }
 
 my @java_args;
@@ -40,6 +39,7 @@ my $contaminant;
 my $threads;
 my $quiet;
 my $nogroup;
+my $casava;
 
 my $result = GetOptions('version' => \$version,
 						'help' => \$help,
@@ -49,6 +49,7 @@ my $result = GetOptions('version' => \$version,
 						'extract!' => \$unzip,
 						'format=s' => \$format,
 						'threads=i' => \$threads,
+						'casava' => \$casava,
 						'contaminants=s' => \$contaminant,
 						 );
 
@@ -97,6 +98,10 @@ if ($quiet) {
 	push @java_args ,"-Dfastqc.quiet=true";	
 }
 
+if ($casava) {
+	push @java_args ,"-Dfastqc.casava=true";		
+}
+
 if ($nogroup) {
 	push @java_args ,"-Dfastqc.nogroup=true";	
 }
@@ -115,7 +120,6 @@ if (defined $unzip) {
 
 if ($format) {
 	
-#	unless ($format eq 'bam' || $format eq 'sam' || $format eq 'fastq' || $format eq 'sam_mapped' || $format eq 'bam_mapped' || $format eq 'goby') {
 	unless ($format eq 'bam' || $format eq 'sam' || $format eq 'fastq' || $format eq 'sam_mapped' || $format eq 'bam_mapped') {
 		die "Unrecognised sequence format '$format', acceptale formats are bam,sam,bam_mapped,sam_mapped and fastq\n";
 	}
@@ -180,6 +184,14 @@ DESCRIPTION
                     will not create it.  If this option is not set then the 
                     output file for each sequence file is created in the same
                     directory as the sequence file which was processed.
+                    
+    --casava        Files come from raw casava output. Files in the same sample
+                    group (differing only by the group number) will be analysed
+                    as a set rather than individually. Sequences with the filter
+                    flag set in the header will be excluded from the analysis.
+                    Files must have the same names given to them by casava
+                    (including being gzipped and ending with .gz) otherwise they
+                    won't be grouped together correctly.
                    
     --extract       If set then the zipped output file will be uncomressed in
                     the same directory after it has been created.  By default

@@ -27,12 +27,24 @@ you want to analyse.
  </p>
  <ul>
  <li>FastQ (all quality encoding variants)</li>
+ <li>Casava FastQ files*</li>
  <li>Colorspace FastQ</li>
  <li>GZip compressed FastQ</li>
  <li>SAM</li>
  <li>BAM</li>
  <li>SAM/BAM Mapped only (normally used for colorspace data)</li>
  </ul>
+ 
+ <p>
+ * Casava fastq format is the same as regular fastq except that
+ the data is usually split across multiple files for a single sample.
+ In this mode the program will merge the files in a sample group and
+ present a single report for each sample. Also Casava fastq files
+ contain poor quality sequences which have been flagged to be remove.
+ In Casava mode the program will exclude these flagged sequences from
+ the report.
+ </p>
+ 
  <p>
  By default FastQC will try to guess the file format from the name
  of the input file.  Anything ending in .sam or .bam will be 
@@ -40,7 +52,9 @@ you want to analyse.
  , and everything else will be treated as FastQ format.  If you want 
  to override this detection and specify the file format manually
  then you can use the drop down file filter in the file chooser to
- select the type of file you're going to load.
+ select the type of file you're going to load. You need to use the 
+ drop down selector to make the program use the Mapped BAM or Casava
+ file modes as these won't be selected automatically.
  </p>
  
  
