@@ -1,3 +1,43 @@
+RELEASE NOTES FOR FastQC V0.10.1
+--------------------------------
+
+FastQC v0.10.1 is a bugfix release which works around two problems
+people have encountered with previous releases:
+
+1) A work-round has been put into place for a limitation in the
+java gzip decompressor, where it would read only the first
+compressed block in a file created by concatenating multiple 
+gzipped files directly, rather than decompressing and recompressing
+them.
+
+2) Users who had installed the program in directories containing
+characters required to be encoded in URLs (= & ? etc) were finding
+that the report generation generated an error.  This encoding has
+now been fixed and the program should now have no limits in the 
+name of the directory in which it can be installed.
+
+One additional feature is that in the fastqc wrapper you can now
+specify the location of the java interpreter on the command line
+using the --java parameter, rather than having to have it included
+in the path.
+
+One other change in this release is that the package names for all
+of the java classes have been changed to reflect a change in the
+official project URL.  This means that the launchers for the 
+program have had to be updated to use these new names.  If you have
+created your own launcher, or had copied any of the old ones you'll
+need to update this to use the launchers included in this version
+of the program.
+
+The new URL for the project is:
+
+www.bioinformatics.babraham.ac.uk/projects/fastqc/
+
+..and if you want to report bugs the bugzilla URL is now:
+
+www.bioinformatics.babraham.ac.uk/bugzilla/
+
+
 RELEASE NOTES FOR FastQC V0.10.0
 --------------------------------
 

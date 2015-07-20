@@ -7,7 +7,7 @@ use Getopt::Long;
 # Check to see if they've mistakenly downloaded the source distribution
 # since several people have made this mistake
 
-if (-e "$RealBin/uk/ac/bbsrc/babraham/FastQC/FastQCApplication.java") {
+if (-e "$RealBin/uk/ac/babraham/FastQC/FastQCApplication.java") {
 	die "This is the source distribution of FastQC.  You need to get the compiled version if you want to run the program\n";
 }
 
@@ -40,6 +40,8 @@ my $threads;
 my $quiet;
 my $nogroup;
 my $casava;
+my $kmer_size;
+my $java_bin = 'java';
 
 my $result = GetOptions('version' => \$version,
 						'help' => \$help,
@@ -49,8 +51,10 @@ my $result = GetOptions('version' => \$version,
 						'extract!' => \$unzip,
 						'format=s' => \$format,
 						'threads=i' => \$threads,
+						'kmers=i' => \$kmer_size,
 						'casava' => \$casava,
 						'contaminants=s' => \$contaminant,
+						'java=s' => \$java_bin,
 						 );
 
 # Check the simple stuff first
@@ -94,6 +98,18 @@ else {
 	unshift @java_args,'-Xmx250m';
 }
 
+if ($kmer_size) {
+	unless ($kmer_size =~ /^\d+$/) {
+		die "Kmer size '$kmer_size' was not a number";
+	}
+	
+	if ($kmer_size < 2 or $kmer_size > 10) {
+		die "Kmer size must be in the range 2-10";
+	}
+	
+	push @java_args,"-Dfastqc.kmer_size=$kmer_size";
+}
+
 if ($quiet) {
 	push @java_args ,"-Dfastqc.quiet=true";	
 }
@@ -121,11 +137,23 @@ if (defined $unzip) {
 if ($format) {
 	
 	unless ($format eq 'bam' || $format eq 'sam' || $format eq 'fastq' || $format eq 'sam_mapped' || $format eq 'bam_mapped') {
-		die "Unrecognised sequence format '$format', acceptale formats are bam,sam,bam_mapped,sam_mapped and fastq\n";
+		die "Unrecognised sequence format '$format', acceptable formats are bam,sam,bam_mapped,sam_mapped and fastq\n";
 	}
 	
 	push @java_args,"-Dfastqc.sequence_format=$format";	
 	
+}
+
+if ($java_bin ne 'java') {
+#	$java_bin =~ s/\\/\//g;
+	
+	unless (-e $java_bin) {
+		die "Couldn't find java interpreter at '$java_bin'";
+	}
+	
+#	if ($java_bin =~ / /) {
+#		$java_bin = "\"$java_bin\"";
+#	}	
 }
 
 
@@ -147,7 +175,13 @@ if (@files or $version or $help) {
 	push @java_args, "-Djava.awt.headless=true";
 }
 
-exec "java",@java_args, "uk.ac.bbsrc.babraham.FastQC.FastQCApplication", @files;
+
+if ($java_bin ne 'java') {
+	system $java_bin,@java_args, "uk.ac.babraham.FastQC.FastQCApplication", @files;
+}
+else {
+	exec $java_bin,@java_args, "uk.ac.babraham.FastQC.FastQCApplication", @files;
+}
 
 __DATA__
 
@@ -169,7 +203,7 @@ DESCRIPTION
     
     If no files to process are specified on the command line then the program
     will start as an interactive graphical application.  If files are provided
-    on the commmand line then the program will run with no user interaction
+    on the command line then the program will run with no user interaction
     required.  In this mode it is suitable for inclusion into a standardised
     analysis pipeline.
     
@@ -193,10 +227,14 @@ DESCRIPTION
                     (including being gzipped and ending with .gz) otherwise they
                     won't be grouped together correctly.
                    
-    --extract       If set then the zipped output file will be uncomressed in
+    --extract       If set then the zipped output file will be uncompressed in
                     the same directory after it has been created.  By default
                     this option will be set if fastqc is run in non-interactive
                     mode.
+                    
+    -j --java       Provides the full path to the java binary you want to use to
+                    launch fastqc. If not supplied then java is assumed to be in
+                    your path.
                    
     --noextract     Do not uncompress the output file after creating it.  You
                     should set this option if you do not wish to uncompress
@@ -224,11 +262,15 @@ DESCRIPTION
                     form name[tab]sequence.  Lines prefixed with a hash will
                     be ignored.
                     
+   -k --kmers       Specifies the length of Kmer to look for in the Kmer content
+                    module. Specified Kmer length must be between 2 and 10. Default
+                    length is 5 if not specified.
+                    
    -q --quiet       Supress all progress messages on stdout and only report errors.
                     
 BUGS
 
     Any bugs in fastqc should be reported either to simon.andrews@babraham.ac.uk
-    or in www.bioinformatics.bbsrc.ac.uk/bugzilla/
+    or in www.bioinformatics.babraham.ac.uk/bugzilla/
                    
     
