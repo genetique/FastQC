@@ -1,3 +1,40 @@
+RELEASE NOTES FOR FastQC v0.11.3
+--------------------------------
+
+This is a minor bug-fix release which addresses some issues 
+reported with the v0.11.2 release.
+
+1) Fixed a bug when using the limits.txt file to disable the per
+   tile analysis module.
+   
+2) Fixed a documentation error in the duplicated sequences plot.
+
+3) Fixed a thread safety bug when processing multiple files in a 
+   single session which caused the program not to exit when all
+   processing had in fact completed.
+   
+4) Fixed a bug which meant that forced formats in the interactive
+   application weren't being honoured.
+   
+5) Fixed a bug in the way soft clipping was applied when we were
+   analysing only mapped data.
+   
+6) Fix a memory issue when trying to parse tile names in cases where
+   we mistakenly think we're identify tile numbers, but we aren't
+   
+7) Fix a bug in the text reporting of per-tile quality scores
+
+8) Add the SOLID smallRNA adapter to the default adapter search set
+
+9) Fix a bug in casava mode when using uncompressed fastq files
+
+10) Increase the number of sampled sequences in the duplicate and 
+   overrepresented module to 100,000.
+   
+11) Add a clean up of data structures for the Kmer module so that
+    the interactive mode can process more files without dying.
+
+
 RELEASE NOTES FOR FastQC v0.11.2
 --------------------------------
 
